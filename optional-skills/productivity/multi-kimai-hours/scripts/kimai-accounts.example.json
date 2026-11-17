@@ -1,0 +1,26 @@
+{
+  "sheet": {
+    "spreadsheet_id": "REPLACE_WITH_TEAM_SHEET_ID",
+    "tab": "TeamHours"
+  },
+  "accounts": [
+    {
+      "name": "dev-a-gmi",
+      "developer": "Developer A",
+      "url": "https://kimai.example.com",
+      "username": "dev-a",
+      "token": "REPLACE_ME",
+      "projectId": 1,
+      "timezone": "Asia/Karachi"
+    },
+    {
+      "name": "dev-b-gmi",
+      "developer": "Developer B",
+      "url": "https://kimai.example.com",
+      "username": "dev-b",
+      "token": "REPLACE_ME",
+      "projectId": 1,
+      "timezone": "Asia/Karachi"
+    }
+  ]
+}
