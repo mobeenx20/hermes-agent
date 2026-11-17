@@ -1,0 +1,6 @@
+{
+  "mobile-app": "~/Dev/mobile-app",
+  "mtmpro": "~/Dev/mtmpro",
+  "claude-repository": "~/Dev/claude-repository",
+  "_note": "Projects not listed here are meta/config reports with no on-disk repo (e.g., dev-environment). File resolution only applies to projects in this map."
+}
