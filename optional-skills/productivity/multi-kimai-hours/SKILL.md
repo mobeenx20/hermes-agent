@@ -128,14 +128,21 @@ serial numbers and ISO text.
 5. **A wholesale mismatch** (totals entirely different from expectation) means
    projectId or token changed: do not write, re-check the config first.
 
-## Validation snapshot (2026-11-16, reference server)
+## Validation snapshot (2026-11-17, reference server)
 
 Two accounts read live (GetMyInvoices project 1, GMI - Scripts project 69):
-- 2026-11-16 project 1: 3 closed entries = 8.53h (12840+10500+7380 sec).
-- Cross-midnight checks 2026-10-26/27 (entries 229261, 229565) reproduce the
-  established split figures (see work-hours-bot-ops, Oct 26-28 note).
-- `fill-local` wrote and verified a scratch CSV; `fill-google --dry-run`
-  produced a plan without touching the sheet.
+- 2026-11-16 project 1: 4 entries seen, split total 8.75h including one
+  cross-midnight entry (#233782, 23:12 -> 00:13).
+- Cross-midnight checks 2026-10-26/27/28 (entries 229261, 229565) reproduce
+  the established split figures exactly: 5.47 / 6.77 / 6.93 (begin-date sums
+  5.53 / 7.43 / 6.20 differ as expected).
+- `fill-local` wrote and verified a scratch CSV: idempotent reruns write 0,
+  STALE 3.00 auto-repaired to 5.47, a zero reading left a 2.50 cell intact.
+- `fill-google` ran end-to-end on a scratch spreadsheet (created, header +
+  rows written, read-back verified, rerun idempotent, STALE repair matched
+  the CSV behavior); scratch spreadsheet deleted afterwards. The real team
+  sheet was never touched: live writes wait for the user's explicit go.
+- Future-day guard verified (2026-11-18 refused, noted, nothing written).
 
 ## Related
 

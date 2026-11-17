@@ -56,14 +56,17 @@ into a local sheet or a Google Sheet, unattended.
 - `scripts/run_team_fill.sh`     cron wrapper (silent on success)
 - `scripts/kimai-accounts.example.json`  config template
 
-## Test plan (results recorded in SKILL.md)
+## Test plan (executed 2026-11-17, results in SKILL.md)
 
 1. Multi-account `read` against the live reference server with two accounts
    (GetMyInvoices project 1 and GMI - Scripts project 69).
-2. Cross-midnight split check on 2026-10-26/27/28 (entries 229261, 229565).
-3. `fill-local` real write to a scratch CSV plus read-back.
-4. `fill-google --dry-run` against the live spreadsheet; live writes wait for
-   the user's explicit go.
+2. Cross-midnight split check on 2026-10-26/27/28 (entries 229261, 229565):
+   5.47 / 6.77 / 6.93 split-aware vs 5.53 / 7.43 / 6.20 begin-date.
+3. `fill-local` real write to a scratch CSV plus read-back; idempotent rerun;
+   STALE auto-repair; zero-never-clears; future-day guard.
+4. `fill-google` end-to-end on a scratch spreadsheet (create, fill, verify,
+   idempotent rerun, STALE repair), then deleted. Live team-sheet writes wait
+   for the user's explicit go.
 
 ## Out of scope
 
