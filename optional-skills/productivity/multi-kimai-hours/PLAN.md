@@ -37,15 +37,19 @@ into a local sheet or a Google Sheet, unattended.
    (spreadsheet_id, tab). Template: `scripts/kimai-accounts.example.json`.
 2. One script `scripts/kimai_team_hours.py`, subcommands:
    - `read`        per-account hours for `--date` or `--from/--to` (`--json` for cron)
-   - `fill-local`  upsert into a local `.csv` (or `.xlsx` when openpyxl exists)
-   - `fill-google` upsert into a Google Sheet tab
+   - `fill-local`  upsert into a local `.csv`
+   - `fill-google` upsert into a Google Sheet tab (in-session: plan via
+     `--dry-run`, write via google MCP tools; live mode for cron)
    - shared flags: `--config`, `--accounts NAME[,NAME]`, `--dry-run`, `--force`
-3. Sheet layout (both targets): `A Date | B Day | <one column per developer>`.
+3. **Target is never guessed (user rule):** before any fill, the skill asks
+   the user (poll) whether to use the local sheet file or the Google sheet
+   via MCP. `run_team_fill.sh` requires the target as its first argument.
+4. Sheet layout (both targets): `A Date | B Day | <one column per developer>`.
    Rows are keyed by date in column A; missing rows are appended in date order.
-4. Book-keeping rules carried over unchanged from the proven single-account
+5. Book-keeping rules carried over unchanged from the proven single-account
    pipeline: split at midnight, running = unknown, round the SUM at 2dp,
    zero never clears a cell, never fill a future day, verify every write.
-5. Cron-ready: `--json` gives pure machine output, exit 0 ok / 1 error /
+6. Cron-ready: `--json` gives pure machine output, exit 0 ok / 1 error /
    2 verification failure. Wrapper: `scripts/run_team_fill.sh`.
 
 ## Files

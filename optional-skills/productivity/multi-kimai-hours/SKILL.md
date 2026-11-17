@@ -54,6 +54,42 @@ order.
 - `name` is the CLI key (`--accounts dev-a-gmi`), `developer` is the sheet
   column header. `projectId` filters to that developer's project.
 - Credentials live ONLY in the config file. Never commit it.
+- `sheet.default_target` (`local` / `google` / `both`) is optional; when set
+  it only orders the ask-first poll options. It never skips the ask.
+
+## Ask first: which target? (mandatory, user rule)
+
+Before ANY fill, ask the user which target this run writes. Use a poll
+(clarify) with pickable options, recommended first:
+
+1. **Local sheet file (CSV)** -> `fill-local`
+2. **Google Sheet (via google MCP)** -> the google MCP write path (below)
+3. **Both** -> run both, only when both are configured
+
+Option order: `sheet.default_target` first when set; else the fully
+configured target first; else Local first. Skip the ask ONLY when the user's
+request already names the target ("fill the google sheet") or the user
+already answered this session. `read` never needs the ask.
+
+Unattended (cron) runs never ask: decide the target ONCE when creating the
+cron job (that IS the ask), then pass it explicitly to `run_team_fill.sh`.
+The wrapper refuses to guess a target.
+
+## Google target (via google MCP)
+
+In-session, prefer the google MCP tools (`mcp__google__sheets_update` /
+`sheets_read`; HTTP curl pattern in work-hours-tracking when tools are not
+exposed) over direct API calls, per the user's MCP-first preference:
+
+1. `fill-google --dry-run` computes the plan (splits + cell rules) and
+   prints `planned_writes` (cell + value) without touching the sheet.
+2. Apply each planned cell as a single `USER_ENTERED` write via the MCP.
+3. Read the cells back and compare; do not report done on a mismatch.
+
+`fill-google` (live) stays the unattended/cron path: same google-mcp
+credentials (`~/.config/google-mcp/credentials.json` +
+`~/.local/share/google-mcp/tokens.json`), same rules, same read-back
+verification.
 
 ## Commands
 
@@ -71,9 +107,12 @@ $PY $S fill-local --date 2026-11-16 --dry-run # report only, write nothing
 
 Shared flags: `--config`, `--accounts NAME[,NAME]`, `--date` / `--from`+`--to`,
 `--force`, `--dry-run`, `--json`. Exit codes: 0 ok, 1 error, 2 verify failure.
+Which of `fill-local` / `fill-google` runs is decided by the ask-first poll
+above, never by the agent.
 
-Cron wrapper `scripts/run_team_fill.sh`: silent on success (empty stdout),
-prints only when attention is needed; safe for `no_agent` cron jobs.
+Cron wrapper `scripts/run_team_fill.sh`: requires an explicit target as the
+first argument (`fill-local` or `fill-google`); silent on success (empty
+stdout), prints only when attention is needed; safe for `no_agent` cron jobs.
 
 ## Book-keeping rules (non-negotiable)
 

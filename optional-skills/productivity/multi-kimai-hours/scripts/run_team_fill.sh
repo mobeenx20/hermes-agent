@@ -6,32 +6,32 @@
 # Prints the fill report only when a write failed or verification failed.
 #
 # Usage:
-#   run_team_fill.sh                  # fill today, both targets per config
-#   run_team_fill.sh --date 2026-11-16
-#   run_team_fill.sh --dry-run
-#   run_team_fill.sh fill-local ...   # pass a subcommand to override
+#   run_team_fill.sh fill-local  [--date YYYY-MM-DD] [...]   # CSV target
+#   run_team_fill.sh fill-google [--date YYYY-MM-DD] [...]   # Google tab
 #
-# Schedule (example, GMT+5), one entry per developer is NOT needed: the
-# config lists all accounts, so a single job covers everyone:
-#   55 23 * * *  /path/to/run_team_fill.sh --json
+# The target is NEVER guessed (user rule: ask first which target to use).
+# Interactive runs ask via poll; for cron, decide the target ONCE when the
+# job is created and pass it explicitly here. An omitted or unknown target
+# is an error (exit 64), not a default.
+#
+# Schedule (example, GMT+5) - the config lists all accounts, so one job
+# covers every developer:
+#   55 23 * * *  /path/to/run_team_fill.sh fill-google
 set -eu
 
 PY="${HERMES_PY:-$HOME/.hermes/hermes-agent/venv/bin/python}"
 SCRIPT="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)/kimai_team_hours.py"
 
 case "${1:-}" in
-  read|fill-local|fill-google) CMD="$1"; shift ;;
-  "")                          CMD="fill-local" ;;
-  *)                           CMD="fill-local" ;;
+  fill-local|fill-google) CMD="$1"; shift ;;
+  *)
+    echo "run_team_fill.sh: target required (fill-local | fill-google)." >&2
+    echo "Ask the user which target to use; do not guess." >&2
+    exit 64
+    ;;
 esac
 
-# default flags: today, json output, no summary noise
-ARGS=""
-case "$CMD" in
-  fill-*) ARGS="--json" ;;
-esac
-
-OUT="$("$PY" "$SCRIPT" "$CMD" $ARGS "$@" 2>&1)" || {
+OUT="$("$PY" "$SCRIPT" "$CMD" --json "$@" 2>&1)" || {
   echo "team-hours fill FAILED:"
   echo "$OUT"
   exit 1

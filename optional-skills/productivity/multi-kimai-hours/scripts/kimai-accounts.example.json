@@ -1,7 +1,9 @@
 {
   "sheet": {
     "spreadsheet_id": "REPLACE_WITH_TEAM_SHEET_ID",
-    "tab": "TeamHours"
+    "tab": "TeamHours",
+    "csv": "~/team-hours.csv",
+    "default_target": "REPLACE_local_or_google_or_both"
   },
   "accounts": [
     {
